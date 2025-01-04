@@ -1,10 +1,12 @@
-import { Tile } from "@/models/tile";
+import { Tile,TileMap } from "@/models/tile";
 import { uid } from "uid";
-type State = { board: string[][]; tiles: { [id: string]: Tile } };
-type Action = { type: 'create_tile', tile: Tile};
+import { tileCountPerDimension } from "@/constant";
+import { isNil } from "lodash";
+type State = { board: string[][]; tiles: TileMap };
+type Action = { type: 'create_tile', tile: Tile} | {type: 'move_up'} | {type: 'move_down'} | {type: 'move_left'} | {type: 'move_right'};
 
 // Generate a blank board, each element is undefined.
-function createBoard(tileCountPerDimension: number = 4) {
+function createBoard() {
   const board: string[][] = [];
   for (let i = 0; i < tileCountPerDimension; i += 1) {
     board[i] = new Array(tileCountPerDimension).fill(undefined);
@@ -25,11 +27,105 @@ export default function gameReducer(state: State = initialState, action: Action)
         ...state, // keep the rest of the state unchanged
         board: newBoard,
         tiles: {
-          ...state.tiles, // keep the rest of the tiles unchanged, �� state.tiles �����е����м�ֵ��չ�����µ� tiles ������
+          ...state.tiles, // keep the rest of the tiles unchanged
           [tileId]: action.tile, // add the new tile to the tiles
         },
       };
     }
+
+    case "move_up": {
+        const newBoard = createBoard();
+        const newTiles: TileMap = {};
+        for (let x = 0; x < tileCountPerDimension; x++) {
+          let newY = 0;
+          for (let y = 0; y < tileCountPerDimension; y++) {
+            const tileId = state.board[y][x];
+            if (!isNil(tileId)) {
+              newBoard[newY][x] = tileId;
+              newTiles[tileId] = {
+                ...state.tiles[tileId],
+                position: [x, newY],
+              };
+              newY++;
+            }
+          }
+        }
+        return {
+          ...state,
+          board: newBoard,
+          tiles: newTiles,
+        };
+      }
+
+      case "move_down": {
+        const newBoard = createBoard();
+        const newTiles: TileMap = {};
+        for (let x = 0; x < tileCountPerDimension; x++) {
+          let newY = tileCountPerDimension - 1;
+          for (let y = 0; y < tileCountPerDimension; y++) {
+            const tileId = state.board[y][x];
+            if (!isNil(tileId)) {
+              newBoard[newY][x] = tileId;
+              newTiles[tileId] = {
+                ...state.tiles[tileId],
+                position: [x, newY],
+              };
+              newY--;
+            }
+          }
+        }
+        return {
+          ...state,
+          board: newBoard,
+          tiles: newTiles,
+        };
+      }
+      case "move_left": {
+        const newBoard = createBoard();
+        const newTiles: TileMap = {};
+        for (let y = 0; y < tileCountPerDimension; y++) {
+          let newX = 0;
+          for (let x = 0; x < tileCountPerDimension; x++) {
+            const tileId = state.board[y][x];
+            if (!isNil(tileId)) {
+              newBoard[y][newX] = tileId;
+              newTiles[tileId] = {
+                ...state.tiles[tileId],
+                position: [newX, y],
+              };
+              newX++;
+            }
+          }
+        }
+        return {
+          ...state,
+          board: newBoard,
+          tiles: newTiles,
+        };
+      }
+      case "move_right": {
+        const newBoard = createBoard();
+        const newTiles: TileMap = {};
+        for (let y = 0; y < tileCountPerDimension; y++) {
+          let newX = tileCountPerDimension - 1;
+          for (let x = 0; x < tileCountPerDimension; x++) {
+            const tileId = state.board[y][x];
+            if (!isNil(tileId)) {
+              newBoard[y][newX] = tileId;
+              newTiles[tileId] = {
+                ...state.tiles[tileId],
+                position: [newX, y],
+              };
+              newX--;
+            }
+          }
+        }
+        return {
+          ...state,
+          board: newBoard,
+          tiles: newTiles,
+        };
+      }
 
     default:
       return state // return the state unchanged for unknown action types
