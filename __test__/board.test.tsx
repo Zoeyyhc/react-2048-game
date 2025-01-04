@@ -8,4 +8,12 @@ describe("Board", () => {
 
     expect(cellElements.length).toBe(16);
   });
+
+  it("should render the board with 2 tiles", () => {
+    const { container } = render(<Board />);
+    const tiles = container.querySelectorAll(".tile");
+
+    expect(tiles.length).toBe(2);
+  });
+
 });

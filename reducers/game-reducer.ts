@@ -25,7 +25,7 @@ export default function gameReducer(state: State = initialState, action: Action)
         ...state, // keep the rest of the state unchanged
         board: newBoard,
         tiles: {
-          ...state.tiles, // keep the rest of the tiles unchanged, 将 state.tiles 对象中的所有键值对展开到新的 tiles 对象中
+          ...state.tiles, // keep the rest of the tiles unchanged, 锟斤拷 state.tiles 锟斤拷锟斤拷锟叫碉拷锟斤拷锟叫硷拷值锟斤拷展锟斤拷锟斤拷锟铰碉拷 tiles 锟斤拷锟斤拷锟斤拷
           [tileId]: action.tile, // add the new tile to the tiles
         },
       };
