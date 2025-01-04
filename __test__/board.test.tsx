@@ -15,5 +15,4 @@ describe("Board", () => {
 
     expect(tiles.length).toBe(2);
   });
-
 });
