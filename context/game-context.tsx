@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 export const GameContext = createContext({
   appendRandomTile: () => {},
-  gameState: initialState,
+  getTiles: () => [],
   dispatch: (_: any) => {},
 });
 
@@ -34,8 +34,13 @@ export default function GameProvider({ children }: PropsWithChildren) {
       dispatch({ type: "create_tile", tile: newTile });
     }
   };
+  const getTiles = () => {
+    return gameState.tilesByIds.map(
+      (tileId: string) => gameState.tiles[tileId],
+    );
+  };
   return (
-    <GameContext.Provider value={{ appendRandomTile, gameState, dispatch }}>
+    <GameContext.Provider value={{ appendRandomTile, getTiles, dispatch }}>
       {children}
     </GameContext.Provider>
   );

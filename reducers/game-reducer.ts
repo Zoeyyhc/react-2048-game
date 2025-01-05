@@ -2,7 +2,7 @@ import { Tile, TileMap } from "@/models/tile";
 import { uid } from "uid";
 import { tileCountPerDimension } from "@/constant";
 import { flatten, flattenDeep, isNil } from "lodash";
-type State = { board: string[][]; tiles: TileMap };
+type State = { board: string[][]; tiles: TileMap; tilesByIds: string[] };
 type Action =
   | { type: "create_tile"; tile: Tile }
   | { type: "move_up" }
@@ -20,7 +20,11 @@ function createBoard() {
   return board;
 }
 
-export const initialState: State = { board: createBoard(), tiles: {} };
+export const initialState: State = {
+  board: createBoard(),
+  tiles: {},
+  tilesByIds: [],
+};
 
 export default function gameReducer(
   state: State = initialState,
@@ -44,6 +48,7 @@ export default function gameReducer(
       return {
         ...state,
         tiles: newTiles,
+        tilesByIds: Object.keys(newTiles),
       };
     }
     case "create_tile": {
@@ -58,6 +63,7 @@ export default function gameReducer(
           ...state.tiles, // keep the rest of the tiles unchanged
           [tileId]: { id: tileId, ...action.tile }, // add the new tile to the tiles
         },
+        tilesByIds: [...state.tilesByIds, tileId],
       };
     }
 
@@ -107,7 +113,7 @@ export default function gameReducer(
       for (let x = 0; x < tileCountPerDimension; x++) {
         let newY = tileCountPerDimension - 1;
         let previousTile: Tile | undefined;
-        for (let y = 0; y < tileCountPerDimension; y++) {
+        for (let y = tileCountPerDimension - 1; y >= 0; y--) {
           const tileId = state.board[y][x];
           const currentTile = state.tiles[tileId];
           if (!isNil(tileId)) {

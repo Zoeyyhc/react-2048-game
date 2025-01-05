@@ -26,11 +26,13 @@ describe("gameReducer", () => {
       });
       const [stateBefore] = result.current;
       expect(Object.values(stateBefore.tiles)).toHaveLength(2);
+      expect(stateBefore.tilesByIds).toHaveLength(2);
 
       act(() => dispatch({ type: "clean_up" }));
 
       const [stateAfter] = result.current;
       expect(Object.values(stateAfter.tiles)).toHaveLength(1);
+      expect(stateAfter.tilesByIds).toHaveLength(1);
     });
   });
   describe("create_tile", () => {
@@ -48,10 +50,14 @@ describe("gameReducer", () => {
       act(() => dispatch({ type: "create_tile", tile }));
 
       const [state] = result.current;
+      const tileId = state.board[0][0];
+
+      expect(tileId).toBeDefined();
       expect(state.board[0][0]).toBeDefined();
       expect(Object.values(state.tiles)).toEqual([
         { id: state.board[0][0], ...tile },
       ]);
+      expect(state.tilesByIds).toEqual([tileId]);
     });
   });
   describe("move_up", () => {
@@ -241,6 +247,41 @@ describe("gameReducer", () => {
       expect(isNil(stateAfter.board[1][0])).toBeTruthy();
       expect(isNil(stateAfter.board[2][0])).toBeTruthy();
       expect(stateAfter.tiles[stateAfter.board[3][0]].value).toBe(4);
+    });
+
+    it("should keep the orginal order of tiles (regression test)", () => {
+      const tile1: Tile = {
+        position: [0, 1],
+        value: 4,
+      };
+      const tile2: Tile = {
+        position: [0, 3],
+        value: 2,
+      };
+
+      const { result } = renderHook(() =>
+        useReducer(gameReducer, initialState),
+      );
+      const [, dispatch] = result.current;
+
+      act(() => {
+        dispatch({ type: "create_tile", tile: tile1 });
+        dispatch({ type: "create_tile", tile: tile2 });
+      });
+
+      const [stateBefore] = result.current;
+      expect(isNil(stateBefore.board[0][0])).toBeTruthy();
+      expect(stateBefore.tiles[stateBefore.board[1][0]].value).toBe(4);
+      expect(isNil(stateBefore.board[2][0])).toBeTruthy();
+      expect(stateBefore.tiles[stateBefore.board[3][0]].value).toBe(2);
+
+      act(() => dispatch({ type: "move_down" }));
+
+      const [stateAfter] = result.current;
+      expect(isNil(stateAfter.board[0][0])).toBeTruthy();
+      expect(isNil(stateAfter.board[1][0])).toBeTruthy();
+      expect(stateAfter.tiles[stateAfter.board[2][0]].value).toBe(4);
+      expect(stateAfter.tiles[stateAfter.board[3][0]].value).toBe(2);
     });
   });
   describe("move_left", () => {
