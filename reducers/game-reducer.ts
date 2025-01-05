@@ -1,14 +1,15 @@
 import { Tile, TileMap } from "@/models/tile";
 import { uid } from "uid";
 import { tileCountPerDimension } from "@/constant";
-import { isNil } from "lodash";
+import { flatten, flattenDeep, isNil } from "lodash";
 type State = { board: string[][]; tiles: TileMap };
 type Action =
   | { type: "create_tile"; tile: Tile }
   | { type: "move_up" }
   | { type: "move_down" }
   | { type: "move_left" }
-  | { type: "move_right" };
+  | { type: "move_right" }
+  | {type: "clean_up"};
 
 // Generate a blank board, each element is undefined.
 function createBoard() {
@@ -26,6 +27,22 @@ export default function gameReducer(
   action: Action,
 ) {
   switch (action.type) {
+    case "clean_up": {
+        const flattenedBoard = flattenDeep(state.board)
+        const newTiles: TileMap = flattenDeep(state.board).reduce((result, tileId: string) => {
+            if(isNil(tileId)) {
+                return result
+            }
+            return{
+                ...result,
+                [tileId]: state.tiles[tileId],
+            }
+        },{})
+        return{
+            ...state,
+            tiles: newTiles,
+        }
+    }
     case "create_tile": {
       const tileId = uid(); // Generate a unique id for the tile
       const [x, y] = action.tile.position; // Get the position of the tile
@@ -36,7 +53,7 @@ export default function gameReducer(
         board: newBoard,
         tiles: {
           ...state.tiles, // keep the rest of the tiles unchanged
-          [tileId]: action.tile, // add the new tile to the tiles
+          [tileId]: {id: tileId, ...action.tile}, // add the new tile to the tiles
         },
       };
     }
@@ -53,6 +70,10 @@ export default function gameReducer(
           const currentTile = state.tiles[tileId];
           if (!isNil(tileId)) {
             if (previousTile?.value === currentTile.value) {
+            newTiles[previousTile.id as string] = {
+                ...previousTile,
+                value: previousTile.value * 2,
+                };
               newTiles[tileId] = {
                 ...currentTile,
                 position: [x, newY - 1],
@@ -88,7 +109,7 @@ export default function gameReducer(
           const currentTile = state.tiles[tileId];
           if (!isNil(tileId)) {
             if (previousTile?.value === currentTile.value) {
-              newTiles[previousTile.id as string] = {
+                newTiles[previousTile.id as string] = {
                 ...previousTile,
                 value: previousTile.value * 2,
               };
