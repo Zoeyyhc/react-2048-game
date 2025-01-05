@@ -5,35 +5,34 @@ import { useReducer } from "react";
 import { isNil } from "lodash";
 
 describe("gameReducer", () => {
+  describe("clean_up", () => {
+    it("shoudld remove all tiles that are not referenced on the board", () => {
+      const tile1: Tile = {
+        position: [0, 1],
+        value: 2,
+      };
+      const tile2: Tile = {
+        position: [0, 3],
+        value: 2,
+      };
+      const { result } = renderHook(() =>
+        useReducer(gameReducer, initialState),
+      );
+      const [, dispatch] = result.current;
+      act(() => {
+        dispatch({ type: "create_tile", tile: tile1 });
+        dispatch({ type: "create_tile", tile: tile2 });
+        dispatch({ type: "move_up" });
+      });
+      const [stateBefore] = result.current;
+      expect(Object.values(stateBefore.tiles)).toHaveLength(2);
 
-describe("clean_up",() => {
-    it("shoudld remove all tiles that are not referenced on the board", ( ) => {
-        const tile1: Tile = {
-            position: [0, 1],
-            value: 2,
-          };
-          const tile2: Tile = {
-            position: [0, 3],
-            value: 2,
-          };
-          const { result } = renderHook(() =>
-            useReducer(gameReducer, initialState),
-          );
-          const [, dispatch] = result.current;
-          act(() => {
-            dispatch({ type: "create_tile", tile: tile1 });
-            dispatch({ type: "create_tile", tile: tile2 });
-            dispatch({ type: "move_up" });
-          });
-          const [stateBefore] = result.current;
-          expect(Object.values(stateBefore.tiles)).toHaveLength(2);
+      act(() => dispatch({ type: "clean_up" }));
 
-          act(() => dispatch({ type: "clean_up" }));
-
-          const [stateAfter] = result.current;
-          expect(Object.values(stateAfter.tiles)).toHaveLength(1);
-})
-});
+      const [stateAfter] = result.current;
+      expect(Object.values(stateAfter.tiles)).toHaveLength(1);
+    });
+  });
   describe("create_tile", () => {
     it("should create a new tile", () => {
       const tile: Tile = {

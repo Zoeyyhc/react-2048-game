@@ -4,6 +4,7 @@ import gameReducer, { initialState } from "@/reducers/game-reducer";
 import { JSX } from "react";
 import Tile from "./tile";
 import { Tile as TileModel } from "@/models/tile";
+import { mergeAnimationDuration } from "@/constant";
 
 export default function Board() {
   const [gameState, dispatch] = useReducer(gameReducer, initialState);
@@ -25,7 +26,7 @@ export default function Board() {
         dispatch({ type: "move_right" });
         break;
     }
-    dispatch({ type: "clean_up" });
+    setTimeout(() => dispatch({ type: "clean_up" }), mergeAnimationDuration);
   };
 
   const renderGrid = () => {
