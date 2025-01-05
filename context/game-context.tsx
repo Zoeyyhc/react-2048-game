@@ -2,10 +2,11 @@ import { createContext, PropsWithChildren, useReducer } from "react";
 import gameReducer, { initialState } from "@/reducers/game-reducer";
 import { tileCountPerDimension } from "@/constant";
 import { isNil } from "lodash";
+import { Tile } from "@/models/tile";
 
 export const GameContext = createContext({
   appendRandomTile: () => {},
-  getTiles: () => [],
+  getTiles: () => [] as Tile[],
   dispatch: (_: any) => {},
 });
 
@@ -35,9 +36,7 @@ export default function GameProvider({ children }: PropsWithChildren) {
     }
   };
   const getTiles = () => {
-    return gameState.tilesByIds.map(
-      (tileId: string) => gameState.tiles[tileId],
-    );
+    return gameState.tilesByIds.map((tileId: string) => gameState.tiles[tileId]);
   };
   return (
     <GameContext.Provider value={{ appendRandomTile, getTiles, dispatch }}>
