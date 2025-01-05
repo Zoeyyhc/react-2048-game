@@ -4,11 +4,10 @@ import gameReducer, { initialState } from "@/reducers/game-reducer";
 import { JSX } from "react";
 import Tile from "./tile";
 import { Tile as TileModel } from "@/models/tile";
-import { mergeAnimationDuration } from "@/constant";
 import { GameContext } from "@/context/game-context";
 
 export default function Board() {
-  const { appendRandomTile, getTiles, dispatch } = useContext(GameContext);
+  const { getTiles, dispatch } = useContext(GameContext);
   const initialized = useRef(false);
 
   const handleKeyDown = useCallback(
@@ -28,12 +27,8 @@ export default function Board() {
           dispatch({ type: "move_right" });
           break;
       }
-      setTimeout(() => {
-        dispatch({ type: "clean_up" });
-        appendRandomTile();
-      }, mergeAnimationDuration);
     },
-    [appendRandomTile, dispatch],
+    [dispatch],
   );
 
   const renderGrid = () => {
