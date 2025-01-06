@@ -6,7 +6,7 @@ import { Tile } from "@/models/tile";
 import { mergeAnimationDuration } from "@/constant";
 
 export const GameContext = createContext({
-  appendRandomTile: () => {},
+  score: 0,
   getTiles: () => [] as Tile[],
   dispatch: (_: any) => {},
 });
@@ -50,7 +50,7 @@ export default function GameProvider({ children }: PropsWithChildren) {
     }
   }, [gameState.hasChanged]);
   return (
-    <GameContext.Provider value={{ appendRandomTile, getTiles, dispatch }}>
+    <GameContext.Provider value={{ score: gameState.score, getTiles, dispatch }}>
       {children}
     </GameContext.Provider>
   );

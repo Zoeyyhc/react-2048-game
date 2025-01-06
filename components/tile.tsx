@@ -33,9 +33,8 @@ export default function Tile({ position, value }: TileProps) {
     zIndex: value,
   };
   return (
-    <div className={styles.tile} style={style}>
-      {" "}
-      {value}{" "}
+    <div className={`${styles.tile} ${styles[`tile${value}`]}`} style={style}>
+      {value}
     </div>
   );
 }
