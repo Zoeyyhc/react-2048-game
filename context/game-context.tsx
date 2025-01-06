@@ -50,7 +50,9 @@ export default function GameProvider({ children }: PropsWithChildren) {
     }
   }, [gameState.hasChanged]);
   return (
-    <GameContext.Provider value={{ score: gameState.score, getTiles, dispatch }}>
+    <GameContext.Provider
+      value={{ score: gameState.score, getTiles, dispatch }}
+    >
       {children}
     </GameContext.Provider>
   );

@@ -32,22 +32,24 @@ export default function Board() {
     [dispatch],
   );
 
-  const handleSwipe = useCallback(({deltaX, deltaY}: SwipeInput) => {
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 0) {
-        dispatch({ type: "move_right" });
+  const handleSwipe = useCallback(
+    ({ deltaX, deltaY }: SwipeInput) => {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0) {
+          dispatch({ type: "move_right" });
+        } else {
+          dispatch({ type: "move_left" });
+        }
       } else {
-        dispatch({ type: "move_left" });
+        if (deltaY > 0) {
+          dispatch({ type: "move_down" });
+        } else {
+          dispatch({ type: "move_up" });
+        }
       }
-    } else {
-      if (deltaY > 0) {
-        dispatch({ type: "move_down" });
-      } else {
-        dispatch({ type: "move_up" });
-      }
-    }
-  }, [dispatch]);
-
+    },
+    [dispatch],
+  );
 
   const renderGrid = () => {
     const cells: JSX.Element[] = [];
@@ -93,12 +95,12 @@ export default function Board() {
   }, [handleKeyDown]);
 
   return (
-<MobileSwiper onSwipe={handleSwipe}>
-<div className={styles.board}>
-      <div className={styles.tiles}>{renderTiles()}</div>
+    <MobileSwiper onSwipe={handleSwipe}>
+      <div className={styles.board}>
+        <div className={styles.tiles}>{renderTiles()}</div>
 
-      <div className={styles.grid}>{renderGrid()}</div>
-    </div>
-</MobileSwiper>
+        <div className={styles.grid}>{renderGrid()}</div>
+      </div>
+    </MobileSwiper>
   );
 }

@@ -1,52 +1,59 @@
-import { PropsWithChildren, useRef, useState, useCallback, useEffect} from "react";
+import {
+  PropsWithChildren,
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 
-export type SwipeInput = {deltaX: number, deltaY: number};
+export type SwipeInput = { deltaX: number; deltaY: number };
 
-type MobileSwiperProps = PropsWithChildren<{onSwipe: (input: SwipeInput) => void}>
+type MobileSwiperProps = PropsWithChildren<{
+  onSwipe: (input: SwipeInput) => void;
+}>;
 
 export default function MobileSwiper({ children, onSwipe }: MobileSwiperProps) {
-    const wrappwerRef = useRef<HTMLDivElement>(null);
-    const [startX, setStartX] = useState(0);
-    const [startY, setStartY] = useState(0);
-    const handleTouchStart = useCallback((e: TouchEvent) => {
+  const wrappwerRef = useRef<HTMLDivElement>(null);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    if (!wrappwerRef.current?.contains(e.target as Node)) {
+      return;
+    }
+    e.preventDefault();
+    setStartX(e.touches[0].clientX);
+    setStartY(e.touches[0].clientY);
+  }, []);
+  const handleTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      if (!wrappwerRef.current?.contains(e.target as Node)) {
+        return;
+      }
+      e.preventDefault();
 
-        if (!wrappwerRef.current?.contains(e.target as Node)) {
-            return;
-        }
-        e.preventDefault();
-        setStartX(e.touches[0].clientX);
-        setStartY(e.touches[0].clientY);
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
 
-    }, []);
-    const handleTouchEnd = useCallback((e: TouchEvent) => {
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
 
-        if (!wrappwerRef.current?.contains(e.target as Node)) {
-            return;
-        }
-        e.preventDefault();
+      onSwipe({ deltaX, deltaY });
 
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
+      setStartX(0);
+      setStartY(0);
+    },
+    [startX, startY, onSwipe],
+  );
 
-        const deltaX = endX - startX;
-        const deltaY = endY - startY;
+  useEffect(() => {
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd, { passive: false });
 
-        onSwipe({deltaX, deltaY});
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [handleTouchStart, handleTouchEnd]);
 
-        setStartX(0);
-        setStartY(0);
-
-    }, [startX, startY, onSwipe]);
-
-    useEffect(() => {
-        window.addEventListener("touchstart", handleTouchStart, {passive: false});
-        window.addEventListener("touchend", handleTouchEnd, {passive: false});
-
-        return () => {
-            window.removeEventListener("touchstart", handleTouchStart);
-            window.removeEventListener("touchend", handleTouchEnd);}
-    },[handleTouchStart, handleTouchEnd]);
-
-
-    return <div ref={wrappwerRef}>{children}</div>
+  return <div ref={wrappwerRef}>{children}</div>;
 }

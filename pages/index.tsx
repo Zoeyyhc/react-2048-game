@@ -1,11 +1,11 @@
 import Head from "next/head";
 import Board from "../components/board";
-import styles from "@/styles/index.module.css"
+import styles from "@/styles/index.module.css";
 import Score from "@/components/score";
 
 export default function Home() {
   return (
-    <div className = {styles.twenty48}>
+    <div className={styles.twenty48}>
       <Head>
         <title>Play 2048</title>
         <meta name="description" content="2048 in React" />
@@ -17,7 +17,6 @@ export default function Home() {
         <Score />
       </header>
       <main>
-
         <Board />
       </main>
       <footer> Made with ❤️ by Yuhan</footer>
