@@ -1,14 +1,18 @@
-import { createContext, PropsWithChildren, useEffect, useReducer } from "react";
+import { createContext, PropsWithChildren, useEffect, useReducer,useCallback } from "react";
 import gameReducer, { initialState } from "@/reducers/game-reducer";
 import { tileCountPerDimension } from "@/constant";
-import { isNil } from "lodash";
+import { isNil, throttle } from "lodash";
 import { Tile } from "@/models/tile";
 import { mergeAnimationDuration } from "@/constant";
+import { start } from "repl";
+
+type MoveDirection = "move_up" | "move_down" | "move_left" | "move_right";
 
 export const GameContext = createContext({
   score: 0,
   getTiles: () => [] as Tile[],
-  dispatch: (_: any) => {},
+  moveTiles: (_: MoveDirection) => {},
+  startGame: () => {},
 });
 
 export default function GameProvider({ children }: PropsWithChildren) {
@@ -41,6 +45,16 @@ export default function GameProvider({ children }: PropsWithChildren) {
       (tileId: string) => gameState.tiles[tileId],
     );
   };
+  const moveTiles = useCallback(throttle((direction: MoveDirection)=>{
+    dispatch({ type: direction });
+  }, mergeAnimationDuration * 1.05, {trailing: false}), [dispatch]);
+
+  const startGame = () => {
+    dispatch({ type: "create_tile", tile: { position: [0, 1], value: 2 } });
+    dispatch({ type: "create_tile", tile: { position: [0, 2], value: 2 } });
+  };
+
+
   useEffect(() => {
     if (gameState.hasChanged) {
       setTimeout(() => {
@@ -49,9 +63,10 @@ export default function GameProvider({ children }: PropsWithChildren) {
       }, mergeAnimationDuration);
     }
   }, [gameState.hasChanged]);
+
   return (
     <GameContext.Provider
-      value={{ score: gameState.score, getTiles, dispatch }}
+      value={{ score: gameState.score, getTiles, moveTiles, startGame }}
     >
       {children}
     </GameContext.Provider>
